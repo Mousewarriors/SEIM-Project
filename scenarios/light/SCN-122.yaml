@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-122
+  name: RDP Login From Unusual Subnet
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-122
+  title: RDP Login From Unusual Subnet
+  severity: medium
+  category: identity
+  status: open
+  created_at: '2024-11-20T11:27:00Z'
+  host: WKSTN-031
+  user: bchan
+  description: 'Light alert: RDP Login From Unusual Subnet'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: false_positive
+  severity: low
+  summary: >
+    RDP connection from an unusual source was an IT administrator using a new
+    jump box. The connection was authenticated with proper credentials and MFA,
+    and activity is consistent with admin tasks.
+  key_findings:
+    - RDP originated from newly provisioned admin jump box
+    - Authenticated with proper credentials and MFA
+    - Admin confirmed the session and tasks performed
+  recommended_action: close
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-122.events.jsonl
+  events_file_csv: data/SCN-122.events.csv

@@ -1,0 +1,79 @@
+scenario:
+  id: SCN-011
+  name: Password Spray → VPN Access → Recon → Staging → Exfil Blocked
+  difficulty: intermediate
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-011
+  title: Suspicious VPN Access Followed by Internal Recon and Data Staging
+  severity: critical
+  category: identity_compromise
+  status: open
+  created_at: '2024-12-05T02:04:30Z'
+  host: WKSTN-014
+  user: jdoe
+  description: >-
+    Multiple VPN failures from one IP followed by success, internal AD recon,
+    suspicious script download, and attempted exfiltration.
+iocs:
+  ips:
+    - 198.51.100.23
+    - 91.214.124.31
+    - 45.141.84.61
+  domains:
+    - vpn-status-check.com
+    - files-dropbox-sync.com
+  urls:
+    - http://vpn-status-check.com/status.ps1
+    - https://files-dropbox-sync.com/upload
+  hashes:
+    - 4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f
+    - 11223344556677889900aabbccddeeff00112233445566778899aabbccddeeff
+playbook:
+  name: Compromised Account via VPN / Post-Access Triage
+  steps:
+    - >-
+      Validate VPN login pattern (spray failures → success) and confirm new
+      device/MFA prompts.
+    - >-
+      Pivot to endpoint telemetry for post-login discovery commands and process
+      lineage.
+    - Review LDAP/SMB/RDP activity for lateral movement attempts.
+    - >-
+      Identify downloaded scripts/binaries; validate hashes/domains in
+      VirusTotal.
+    - >-
+      Confirm data staging (archive creation) and outbound exfil attempts;
+      quantify volume.
+    - >-
+      Containment: disable account, revoke VPN sessions, isolate host, block
+      IOCs, reset credentials and review MFA enrollment.
+scoring:
+  required_actions:
+    - identify_password_spray
+    - confirm_compromised_vpn_session
+    - identify_recon_activity
+    - identify_staging
+    - identify_exfil_attempt
+    - recommend_account_lock_and_isolation
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-011.events.jsonl
+  events_file_csv: data/SCN-011.events.csv
+  zeek_dir: data/zeek/SCN-011/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'Suspicious VPN Access Followed by Internal
+    Recon and Data Staging'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Password Spray
+    - Confirm Compromised Vpn Session
+    - Identify Recon Activity
+    - Identify Staging
+    - Identify Exfil Attempt
+    - Recommend Account Lock And Isolation
+  recommended_action: escalate
+  containment_required: true

@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-108
+  name: AV Quarantined Potential Malware
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-108
+  title: AV Quarantined Potential Malware
+  severity: low
+  category: endpoint
+  status: open
+  created_at: '2024-11-20T09:49:00Z'
+  host: WKSTN-014
+  user: jdoe
+  description: 'Light alert: AV Quarantined Potential Malware'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: false_positive
+  severity: low
+  summary: >
+    The USB device insertion was a known authorized peripheral (keyboard/mouse).
+    The endpoint DLP policy flagged all USB insertions, but this was a standard
+    input device, not a storage device.
+  key_findings:
+    - USB device is a standard HID input device (keyboard/mouse)
+    - No mass storage capability — no data exfiltration risk
+    - Device is on the corporate approved peripherals list
+  recommended_action: close
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-108.events.jsonl
+  events_file_csv: data/SCN-108.events.csv

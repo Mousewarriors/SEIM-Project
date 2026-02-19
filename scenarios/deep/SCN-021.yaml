@@ -1,0 +1,77 @@
+scenario:
+  id: SCN-021
+  name: AiTM Phish → Token Theft → Script Exec → Mailbox Abuse
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-116
+  title: AiTM Phishing Suspected (Session Token Theft + Post-Compromise Activity)
+  severity: critical
+  category: identity_compromise
+  status: open
+  created_at: '2024-11-03T09:06:40Z'
+  host: WKSTN-044
+  user: mturner
+  description: >-
+    Lookalike Okta phish led to MFA approval, browser token access, PowerShell
+    script execution, and abnormal O365 activity.
+iocs:
+  ips:
+    - 185.201.18.44
+    - 91.214.124.31
+  domains:
+    - okta-security-login.com
+    - cdn-auth-check.net
+    - company.sharepoint.com
+  urls:
+    - https://okta-security-login.com/verify
+    - http://cdn-auth-check.net/s/status.ps1
+  hashes:
+    - 28128aa879d58571ea3fe723d2ececb2069c347ef8117c71d827fce436be15b0
+    - bef22d161d88e9657ab04eae7460333c92a73a5e611f939ebc2e43571290a9b6
+playbook:
+  name: AiTM Phishing / Session Token Theft Triage
+  steps:
+    - >-
+      Review email authentication results, sender, and embedded URLs; confirm
+      user click.
+    - >-
+      Check browser/proxy telemetry for lookalike domain access and subsequent
+      downloads.
+    - >-
+      Validate endpoint process chain (browser → PowerShell) and any staged
+      token artifacts.
+    - Review identity logs for new IP logins, mailbox access, and rule creation.
+    - >-
+      Identify and block IOCs (domains/IPs/hashes); hunt for other users who
+      clicked.
+    - >-
+      Containment: revoke sessions, reset credentials, enforce
+      phishing-resistant MFA, isolate host if script executed.
+scoring:
+  required_actions:
+    - identify_aitm_phish
+    - confirm_token_theft_indicator
+    - identify_powershell_download_exec
+    - identify_abnormal_o365_login
+    - recommend_session_revoke_reset
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-021.events.jsonl
+  events_file_csv: data/SCN-021.events.csv
+  zeek_dir: data/zeek/SCN-021/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'AiTM Phishing Suspected (Session Token
+    Theft + Post-Compromise Activity)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Aitm Phish
+    - Confirm Token Theft Indicator
+    - Identify Powershell Download Exec
+    - Identify Abnormal O365 Login
+    - Recommend Session Revoke Reset
+  recommended_action: escalate
+  containment_required: true

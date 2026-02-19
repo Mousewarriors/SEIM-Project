@@ -1,0 +1,78 @@
+scenario:
+  id: SCN-025
+  name: Stealer Download → Cookie Theft → Webmail Hijack → Email Exfil
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-120
+  title: >-
+    Infostealer Suspected (Cookie Theft → Webmail Session Hijack → External
+    Exfil)
+  severity: critical
+  category: data_exfiltration
+  status: open
+  created_at: '2024-11-12T16:48:30Z'
+  host: WKSTN-044
+  user: mturner
+  description: >-
+    User downloaded and executed fake update leading to cookie theft, abnormal
+    O365 login, mailbox search, and external email exfiltration.
+iocs:
+  ips:
+    - 54.172.188.11
+    - 91.211.88.33
+    - 142.250.74.101
+  domains:
+    - pdf-viewer-update.com
+    - mail.google.com
+  urls:
+    - https://pdf-viewer-update.com/download/PDFViewerUpdate.exe
+  hashes:
+    - 738ceea3b51809afffea41889906ead22e213d72d0e006652140a6d6a1a50f2d
+    - a18d083403148bafcc53e491b9b79800a739f1b4823a2ab6aa914a4dc24fe9e3
+    - 6abdb2c61f49d7e00113877a1378f7767055b3c5f592be56aaeebf6f46a24903
+playbook:
+  name: Infostealer / Session Hijack / Email Exfil Triage
+  steps:
+    - Review phishing email and clicked URL; collect indicators.
+    - >-
+      Confirm download and execution of suspicious installer; validate hash in
+      VirusTotal.
+    - >-
+      Investigate browser credential/cookie access indicators and staged cookie
+      artifacts.
+    - >-
+      Review identity logs for new IP/ASN logins, mailbox searches, and outbound
+      sends.
+    - Correlate proxy logs for uploads to webmail/cloud and quantify data loss.
+    - >-
+      Containment: isolate host, revoke sessions, reset passwords, block IOCs,
+      notify stakeholders and follow data incident process.
+scoring:
+  required_actions:
+    - identify_stealer_download_exec
+    - confirm_cookie_theft
+    - identify_abnormal_o365_login
+    - identify_mail_search_and_exfil
+    - recommend_isolation_revoke_reset
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-025.events.jsonl
+  events_file_csv: data/SCN-025.events.csv
+  zeek_dir: data/zeek/SCN-025/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'Infostealer Suspected (Cookie Theft →
+    Webmail Session Hijack → External Exfil)'. Analysis reveals suspicious
+    activity.
+  key_findings:
+    - Identify Stealer Download Exec
+    - Confirm Cookie Theft
+    - Identify Abnormal O365 Login
+    - Identify Mail Search And Exfil
+    - Recommend Isolation Revoke Reset
+  recommended_action: escalate
+  containment_required: true

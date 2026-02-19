@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-115
+  name: Password Reset Completed
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-115
+  title: Password Reset Completed
+  severity: low
+  category: identity
+  status: open
+  created_at: '2024-11-20T10:38:00Z'
+  host: WKSTN-031
+  user: bchan
+  description: 'Light alert: Password Reset Completed'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >
+    Windows Defender was disabled via registry modification. This is a common
+    attacker technique to prepare for malware deployment. The host should be
+    isolated and scanned with an alternative AV tool.
+  key_findings:
+    - Windows Defender real-time protection was disabled
+    - Disabled via registry key modification, not GPO
+    - Defense evasion technique — investigate for follow-up malware
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-115.events.jsonl
+  events_file_csv: data/SCN-115.events.csv

@@ -1,0 +1,77 @@
+scenario:
+  id: SCN-013
+  name: RCE on App Server → Scheduled Task Backdoor → DB Lateral + Secrets Exfil
+  difficulty: intermediate
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-013
+  title: Application Server Compromise Suspected (RCE + Scheduled Task Persistence)
+  severity: critical
+  category: server_compromise
+  status: open
+  created_at: '2024-12-10T12:13:10Z'
+  host: SRV-APP-01
+  user: svc_app
+  description: >-
+    Suspicious inbound admin endpoint activity followed by cmd execution,
+    payload download, scheduled task persistence, and DB lateral movement.
+iocs:
+  ips:
+    - 203.0.113.88
+    - 77.91.84.162
+  domains:
+    - cdn-patch-check.net
+  urls:
+    - https://cdn-patch-check.net/patch.ps1
+  hashes:
+    - d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0abcde
+    - e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0abcded4
+    - aa55bb66cc77dd88ee99ff00112233445566778899aabbccddeeff0011223344
+playbook:
+  name: Server Compromise / Persistence / Lateral Movement Triage
+  steps:
+    - >-
+      Review inbound web/WAF/proxy logs for suspicious admin endpoint calls and
+      source IPs.
+    - >-
+      Validate process lineage indicating RCE (service/app spawning
+      cmd/powershell).
+    - >-
+      Identify downloaded payloads (hash/path) and persistence (scheduled
+      tasks).
+    - Pivot to outbound DNS/TLS for C2 and determine beacon/exfil timings.
+    - >-
+      Review internal connections to DB/other servers and credential/secrets
+      access attempts.
+    - >-
+      Containment: isolate server, disable scheduled task, rotate secrets, block
+      IOCs, assess DB integrity.
+scoring:
+  required_actions:
+    - identify_rce_chain
+    - identify_persistence_task
+    - extract_c2_iocs
+    - identify_lateral_to_db
+    - identify_secret_staging
+    - recommend_isolation_and_rotation
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-013.events.jsonl
+  events_file_csv: data/SCN-013.events.csv
+  zeek_dir: data/zeek/SCN-013/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'Application Server Compromise Suspected
+    (RCE + Scheduled Task Persistence)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Rce Chain
+    - Identify Persistence Task
+    - Extract C2 Iocs
+    - Identify Lateral To Db
+    - Identify Secret Staging
+    - Recommend Isolation And Rotation
+  recommended_action: escalate
+  containment_required: true

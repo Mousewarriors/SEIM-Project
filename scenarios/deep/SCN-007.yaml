@@ -1,0 +1,67 @@
+scenario:
+  id: SCN-007
+  name: IIS Webshell → Command Exec → C2 Beaconing
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-007
+  title: IIS Webshell Suspected (w3wp spawning cmd.exe)
+  severity: critical
+  category: web_compromise
+  status: open
+  created_at: '2024-11-21T10:15:40Z'
+  host: SRV-WEB-01
+  user: iis_svc
+  description: >-
+    Suspicious file drop in webroot followed by w3wp -> cmd execution and
+    outbound TLS beaconing.
+iocs:
+  ips:
+    - 185.193.17.91
+    - 203.0.113.77
+  domains:
+    - statics-cdn-assets.org
+  urls:
+    - https://statics-cdn-assets.org/a
+  hashes:
+    - 9c8b7a6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b
+playbook:
+  name: Web Server Compromise / Webshell Triage
+  steps:
+    - >-
+      Review inbound HTTP requests leading to file drop (method, URI, source
+      IP).
+    - Confirm webshell file path/hash and validate in VirusTotal.
+    - Investigate process lineage (w3wp → cmd/powershell) and commands executed.
+    - Pivot to outbound DNS/TLS for potential C2 and beacon intervals.
+    - Check persistence mechanisms (scheduled tasks, services, run keys).
+    - >-
+      Containment: isolate server, remove webshell, rotate secrets, review logs
+      for other impacted endpoints.
+scoring:
+  required_actions:
+    - identify_webshell
+    - confirm_process_lineage
+    - extract_c2_iocs
+    - identify_persistence
+    - recommend_isolation
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-007.events.jsonl
+  events_file_csv: data/SCN-007.events.csv
+  zeek_dir: data/zeek/SCN-007/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'IIS Webshell Suspected (w3wp spawning
+    cmd.exe)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Webshell
+    - Confirm Process Lineage
+    - Extract C2 Iocs
+    - Identify Persistence
+    - Recommend Isolation
+  recommended_action: escalate
+  containment_required: true

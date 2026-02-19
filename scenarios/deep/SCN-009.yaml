@@ -1,0 +1,62 @@
+scenario:
+  id: SCN-009
+  name: USB Copy → External Email → Webmail Upload
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-009
+  title: Possible Insider Exfiltration (USB Copy + External Email)
+  severity: high
+  category: data_exfiltration
+  status: open
+  created_at: '2024-11-28T16:24:30Z'
+  host: WKSTN-014
+  user: jdoe
+  description: >-
+    Removable media activity followed by outbound email with attachment to
+    external recipient and large webmail upload.
+iocs:
+  ips:
+    - 142.250.74.101
+  domains:
+    - mail.google.com
+  urls:
+    - https://mail.google.com/
+  hashes:
+    - 8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b
+playbook:
+  name: Insider / Local Exfiltration Triage
+  steps:
+    - Review device control telemetry (USB insert, serial, timestamps).
+    - Identify files copied to removable media (paths, hashes).
+    - Review outbound email for external recipients and attachments.
+    - Correlate with proxy logs for uploads to webmail/cloud storage.
+    - 'Scope hunt: similar USB events, repeated external sends, other endpoints.'
+    - >-
+      Containment: follow policy (HR/legal), preserve evidence, restrict
+      account/device as required.
+scoring:
+  required_actions:
+    - identify_usb_activity
+    - identify_sensitive_file_copy
+    - identify_external_email
+    - recommend_evidence_preservation
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-009.events.jsonl
+  events_file_csv: data/SCN-009.events.csv
+  zeek_dir: data/zeek/SCN-009/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Possible Insider Exfiltration (USB Copy +
+    External Email)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Usb Activity
+    - Identify Sensitive File Copy
+    - Identify External Email
+    - Recommend Evidence Preservation
+  recommended_action: escalate
+  containment_required: true

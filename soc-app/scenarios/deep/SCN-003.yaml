@@ -1,0 +1,66 @@
+scenario:
+  id: SCN-003
+  name: Macro → Discovery → PsExec Lateral Movement
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-003
+  title: Remote Service Creation (PSEXESVC) on File Server
+  severity: high
+  category: lateral_movement
+  status: open
+  created_at: '2024-11-06T20:09:30Z'
+  host: SRV-FILE-01
+  user: svc_backup
+  description: >-
+    Remote service install observed (PSEXESVC) with preceding macro->cmd
+    activity on workstation.
+iocs:
+  ips:
+    - 104.244.75.23
+  domains:
+    - cdn-assets-update.com
+  urls:
+    - http://cdn-assets-update.com/a.exe
+  hashes:
+    - d1c2b3a4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0
+playbook:
+  name: Lateral Movement Investigation
+  steps:
+    - >-
+      Identify initial execution chain on source endpoint (Office →
+      cmd/powershell).
+    - Review SMB connections and tool usage (PsExec).
+    - Confirm remote service creation on target and commands executed.
+    - Extract IOCs (download URL, external IP, hashes) and validate.
+    - >-
+      Hunt for additional lateral movement attempts (SMB/WinRM/RDP) and new
+      services.
+    - >-
+      Containment: disable compromised account, isolate hosts, block external
+      IOCs, reset credentials.
+scoring:
+  required_actions:
+    - identify_psexec
+    - confirm_remote_service
+    - extract_payload_iocs
+    - recommend_disable_account
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-003.events.jsonl
+  events_file_csv: data/SCN-003.events.csv
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Remote Service Creation (PSEXESVC) on File
+    Server'. Analysis of the event logs reveals: Remote service install observed
+    (PSEXESVC) with preceding macro->cmd activity on workstation..
+  key_findings:
+    - Identify Psexec
+    - Confirm Remote Service
+    - Extract Payload Iocs
+    - Recommend Disable Account
+  recommended_action: escalate
+  containment_required: true

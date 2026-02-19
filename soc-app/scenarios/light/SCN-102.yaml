@@ -1,0 +1,45 @@
+scenario:
+  id: SCN-102
+  name: Multiple Failed MFA Followed by Success
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-102
+  title: Multiple Failed MFA Followed by Success
+  severity: high
+  category: identity
+  status: open
+  created_at: '2024-11-20T09:07:00Z'
+  host: WKSTN-031
+  user: bchan
+  description: 'Light alert: Multiple Failed MFA Followed by Success'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-102.events.jsonl
+  events_file_csv: data/SCN-102.events.csv
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Multiple Failed MFA Followed by Success'.
+    Analysis of the event logs reveals: Light alert: Multiple Failed MFA
+    Followed by Success.
+  key_findings:
+    - Triage
+  recommended_action: escalate
+  containment_required: true

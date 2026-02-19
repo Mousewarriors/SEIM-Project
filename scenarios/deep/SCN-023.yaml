@@ -1,0 +1,75 @@
+scenario:
+  id: SCN-023
+  name: File Server Staging → rclone Exfil → Cleanup Attempts
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-118
+  title: Data Staging and Cloud Exfiltration Suspected (rclone / Large TLS Upload)
+  severity: critical
+  category: data_exfiltration
+  status: open
+  created_at: '2024-11-07T01:24:10Z'
+  host: SRV-FILE-02
+  user: filesvc
+  description: >-
+    File server performed mass copy and archive creation followed by
+    rclone-style transfers to unsanctioned cloud endpoint.
+iocs:
+  ips:
+    - 82.118.242.99
+  domains:
+    - files-sync-cloud.com
+  urls:
+    - https://files-sync-cloud.com/upload
+  hashes:
+    - be83295eb4280e0a229c2a171cf14a2c646e1296285af7c6630c58946079202d
+    - dc685c3e75dd271eb71b8a154bbe92dd53768885854d0e3046dc6606e0170c53
+    - 2423320bf2be446cae2fd78ce2f8c26ecd9ef356e139133bfbdd394c3ac2a8cd
+playbook:
+  name: File Server Exfiltration (rclone) Triage
+  steps:
+    - >-
+      Review file server process execution for staging tools
+      (robocopy/7z/rclone) and command lines.
+    - Confirm archive artifacts and sizes; preserve copies for evidence.
+    - >-
+      Correlate DNS/TLS traffic to unsanctioned cloud endpoints; quantify bytes
+      transferred.
+    - >-
+      Identify source of access (SMB logons) and scope other servers/hosts
+      involved.
+    - >-
+      Containment: isolate server or block egress, disable compromised accounts,
+      block IOCs, rotate secrets and review access controls.
+    - >-
+      Eradication: remove tools/configs, restore from backups if integrity
+      impacted, run retro-hunt for similar rclone usage.
+scoring:
+  required_actions:
+    - identify_staging_tools
+    - identify_archive_artifact
+    - identify_rclone_exfil
+    - quantify_transfer
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-023.events.jsonl
+  events_file_csv: data/SCN-023.events.csv
+  zeek_dir: data/zeek/SCN-023/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'Data Staging and Cloud Exfiltration
+    Suspected (rclone / Large TLS Upload)'. Analysis reveals suspicious
+    activity.
+  key_findings:
+    - Identify Staging Tools
+    - Identify Archive Artifact
+    - Identify Rclone Exfil
+    - Quantify Transfer
+    - Recommend Containment
+  recommended_action: escalate
+  containment_required: true

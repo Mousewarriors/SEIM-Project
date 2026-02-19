@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-116
+  name: VPN Login From New Device
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-116
+  title: VPN Login From New Device
+  severity: medium
+  category: identity
+  status: open
+  created_at: '2024-11-20T10:45:00Z'
+  host: WKSTN-014
+  user: jdoe
+  description: 'Light alert: VPN Login From New Device'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: false_positive
+  severity: low
+  summary: >
+    Multiple authentication failures were caused by a misconfigured service
+    account. The service was recently migrated and the old credentials were not
+    updated in the service configuration.
+  key_findings:
+    - Failures originated from a known service account
+    - Service was recently migrated with stale credentials
+    - IT team confirmed and updated the configuration
+  recommended_action: close
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-116.events.jsonl
+  events_file_csv: data/SCN-116.events.csv

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MITRE Analyzer Workbench</title>
+    <style>
+        body { background: #0a0f16; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #e2e8f0; font-size: 24px; margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 150px; background: #131b29; color: #e2e8f0; border: 1px solid #1e293b; padding: 15px; box-sizing: border-box; font-family: inherit; border-radius: 8px; resize: vertical; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: #00f3ff; }
+        button { background: #00f3ff; color: #000; border: none; padding: 12px 24px; cursor: pointer; font-weight: bold; margin-top: 15px; border-radius: 6px; transition: background 0.2s; font-size: 14px; }
+        button:hover { background: #00cce6; }
+        .result-container { margin-top: 30px; }
+        .result { background: #0d121d; padding: 20px; border: 1px solid #1e293b; margin-bottom: 15px; border-radius: 8px; animation: fadeIn 0.3s ease; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 10px; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-confirmed { background: rgba(0, 255, 157, 0.1); color: #00ff9d; }
+        .badge-potential { background: rgba(255, 176, 32, 0.1); color: #ffb020; }
+        .badge-match { background: #131b29; color: #94a3b8; border: 1px solid #1e293b; }
+        
+        .snippet { color: #94a3b8; font-size: 13px; margin: 8px 0 0 0; line-height: 1.5; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        pre.cmd { background:#030407; padding:12px; border-radius:6px; overflow-x:auto; color:#94a3b8; font-family:'Consolas', monospace; border:1px solid #1e293b; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MITRE Analyzer Workbench</h1>
+        <p>A dedicated tool to test and validate MITRE ATT&CK mappings in isolation.</p>
+        
+        <textarea id="input" placeholder="Paste security alert description, logs, or evidence here to analyze against MITRE KB..."></textarea>
+        <div>
+            <button onclick="analyze()">RUN ANALYSIS</button>
+        </div>
+
+        <div id="output" class="result-container"></div>
+        
+        <div style="margin-top:60px; font-size:13px; color:#475569; padding-top:20px; border-top:1px solid #1e293b">
+            <strong>Developer Tip:</strong><br>
+            To apply changes made to <code>mitre_api_server.py</code>, you must restart the python server.<br>
+            Copy and run this command in your terminal:
+            <pre class="cmd">taskkill /IM python* /F ; python "..\..\Mitre Att&ck Analyzer\mitre_api_server.py"</pre>
+        </div>
+    </div>
+
+    <script>
+        async function analyze() {
+            const text = document.getElementById('input').value;
+            const out = document.getElementById('output');
+            
+            if(!text.trim()) {
+                alert('Please enter some text to analyze.');
+                return;
+            }
+            
+            out.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:40px">Analyzing findings...</div>';
+            
+            try {
+                // Call the Next.js API proxy which forwards to Python
+                const res = await fetch('/api/mitre', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ alertDescription: text })
+                });
+                
+                const data = await res.json();
+                
+                if(data.error) {
+                    out.innerHTML = `<div style="color:var(--red); padding:20px; border:1px solid var(--red); border-radius:8px">Error: ${data.error}</div>`;
+                    return;
+                }
+                
+                const results = data.results || [];
+                
+                if(results.length === 0) {
+                     out.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:40px">No matching techniques found.</div>';
+                     return;
+                }
+
+                out.innerHTML = results.map(r => `
+                    <div class="result">
+                        <div style="display:flex; justify-content:space-between; align-items:center">
+                            <div style="display:flex; align-items:center; gap:10px">
+                                <span style="font-weight:700; color:#00f3ff; background:rgba(0, 243, 255, 0.1); padding:2px 6px; border-radius:4px; font-size:12px; border:1px solid rgba(0,243,255,0.2)">${r.technique_id}</span>
+                                <span style="font-weight:700; font-size:15px">${r.name}</span>
+                            </div>
+                            ${renderBadge(r.relevance || 0)}
+                        </div>
+                        <p class="snippet">${r.description_snippet || 'No description available.'}</p>
+                        <div style="font-size:11px; color:#475569; margin-top:8px">
+                            <strong>Tactics:</strong> ${Array.isArray(r.tactics) ? r.tactics.join(', ') : r.tactics || 'Unknown'}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch(e) {
+                out.innerHTML = `<div style="color:#ff2a2a; padding:20px 0">Client Error: ${e.message}</div>`;
+            }
+        }
+        
+        function renderBadge(score) {
+            // Using standard labels based on score
+            if (score >= 100) return `<span class="badge badge-confirmed">✅ CONFIRMED</span>`;
+            if (score >= 75) return `<span class="badge badge-potential">⚠️ POTENTIAL</span>`;
+            return `<span class="badge badge-match">${Math.round(score)}% Match</span>`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-114
+  name: Blocked Malicious URL Access
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-114
+  title: Blocked Malicious URL Access
+  severity: low
+  category: network
+  status: open
+  created_at: '2024-11-20T10:31:00Z'
+  host: WKSTN-022
+  user: asmith
+  description: 'Light alert: Blocked Malicious URL Access'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: false_positive
+  severity: low
+  summary: >
+    The VPN connection from an unusual location was a legitimate employee
+    working remotely while traveling. User confirmed the login and location
+    matches their travel itinerary.
+  key_findings:
+    - VPN login from unusual geography triggered the alert
+    - User confirmed they are traveling to that location
+    - No other suspicious activity associated with the session
+  recommended_action: close
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-114.events.jsonl
+  events_file_csv: data/SCN-114.events.csv

@@ -1,0 +1,64 @@
+scenario:
+  id: SCN-006
+  name: Kerberoasting → Hash Exfil → Lateral Movement
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-006
+  title: Kerberoasting Activity Detected (Suspicious TGS Requests)
+  severity: high
+  category: credential_access
+  status: open
+  created_at: '2024-11-18T18:33:20Z'
+  host: WKSTN-031
+  user: bchan
+  description: >-
+    Kerberoasting tool execution and suspicious TGS requests followed by
+    outbound TLS upload and lateral movement.
+iocs:
+  ips:
+    - 89.248.163.24
+  domains:
+    - auth-checker.net
+  urls:
+    - https://auth-checker.net/upload
+  hashes:
+    - 6f4d3a2b1c0e9f887766554433221100ffeeddccbbaa99887766554433221100
+playbook:
+  name: Kerberoasting / Credential Access Triage
+  steps:
+    - Review suspicious process execution and command line.
+    - Confirm Kerberos TGS request patterns (4769) and targeted SPNs.
+    - Check for hash artifacts written to disk and potential exfiltration.
+    - Pivot to outbound traffic (DNS/TLS) to identify destinations.
+    - Hunt for subsequent lateral movement (SMB/WMI/WinRM).
+    - >-
+      Containment: reset service account credentials, isolate host, block IOCs,
+      review privileged group membership.
+scoring:
+  required_actions:
+    - identify_kerberoasting
+    - confirm_tgs_requests
+    - identify_exfil
+    - identify_lateral_movement
+    - recommend_service_reset
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-006.events.jsonl
+  events_file_csv: data/SCN-006.events.csv
+  zeek_dir: data/zeek/SCN-006/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Kerberoasting Activity Detected
+    (Suspicious TGS Requests)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Kerberoasting
+    - Confirm Tgs Requests
+    - Identify Exfil
+    - Identify Lateral Movement
+    - Recommend Service Reset
+  recommended_action: escalate
+  containment_required: true

@@ -1,0 +1,68 @@
+scenario:
+  id: SCN-008
+  name: Secret Exposure → Unusual Login → Cloud Storage Transfer
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-008
+  title: Potential Cloud Key Abuse (Unusual S3 Sync Activity)
+  severity: critical
+  category: cloud_compromise
+  status: open
+  created_at: '2024-11-25T09:14:20Z'
+  host: WKSTN-022
+  user: asmith
+  description: >-
+    Suspected API key exposure followed by unusual repo login from new IP and
+    large data transfer to cloud storage.
+iocs:
+  ips:
+    - 185.71.67.20
+    - 34.204.12.77
+  domains:
+    - git-collab.dev
+    - s3-us-east-1.amazonaws.com
+  urls:
+    - https://git-collab.dev/login
+  hashes:
+    - 1e2f3a4b5c6d7e8f00112233445566778899aabbccddeeff0011223344556677
+playbook:
+  name: Cloud Key Exposure / Data Transfer Triage
+  steps:
+    - >-
+      Review developer activity and identify potential secret exposure
+      (.env/config).
+    - Validate identity events (repo login) for unusual IPs/locations.
+    - Correlate host network telemetry with cloud endpoints and data volumes.
+    - Review endpoint commands for cloud CLIs (aws/az/gcloud) and arguments.
+    - >-
+      Scope hunt: other hosts using same keys/buckets; additional logins from
+      same IP.
+    - >-
+      Containment: rotate keys, invalidate sessions/tokens, block suspicious
+      IPs, notify stakeholders.
+scoring:
+  required_actions:
+    - identify_secret_exposure
+    - identify_unusual_login
+    - confirm_large_transfer
+    - recommend_key_rotation
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-008.events.jsonl
+  events_file_csv: data/SCN-008.events.csv
+  zeek_dir: data/zeek/SCN-008/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'Potential Cloud Key Abuse (Unusual S3 Sync
+    Activity)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Secret Exposure
+    - Identify Unusual Login
+    - Confirm Large Transfer
+    - Recommend Key Rotation
+  recommended_action: escalate
+  containment_required: true

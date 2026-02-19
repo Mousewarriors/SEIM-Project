@@ -1,0 +1,70 @@
+scenario:
+  id: SCN-004
+  name: Archive + TLS Upload to Rare Destination
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-004
+  title: Suspected Data Exfiltration to Rare External Destination
+  severity: critical
+  category: data_exfiltration
+  status: open
+  created_at: '2024-11-10T14:03:40Z'
+  host: WKSTN-022
+  user: asmith
+  description: >-
+    Large archive created then uploaded via HTTPS to uncommon destination;
+    persistence via Run key.
+iocs:
+  ips:
+    - 193.29.13.88
+  domains:
+    - fileshare-sync.net
+  urls:
+    - https://fileshare-sync.net/upload
+  hashes:
+    - 0f1e2d3c4b5a69788796a5b4c3d2e1f0aa55bb66cc77dd88ee99ff0011223344
+playbook:
+  name: Data Exfiltration Investigation
+  steps:
+    - Validate archive creation (process lineage, file path, size/hash).
+    - >-
+      Pivot to DNS and TLS/SNI logs for destination domain/IP and first-seen
+      status.
+    - >-
+      Quantify data transfer and identify what was uploaded (file name, time
+      correlation).
+    - Check for staging tools (curl/rclone/megacmd) and persistence mechanisms.
+    - >-
+      Scope hunt: other hosts contacting same destination; other archives
+      created.
+    - >-
+      Containment: isolate host, block destination, investigate user account,
+      notify stakeholders.
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >
+    Confirmed data exfiltration incident. A large archive was created on
+    WKSTN-022 and uploaded via HTTPS to fileshare-sync.net, a rare/uncommon
+    external destination. Persistence was established via a Windows Run registry
+    key. The data transfer volume and destination suggest intentional
+    exfiltration of sensitive data.
+  key_findings:
+    - Large archive file created using staging tools
+    - Data uploaded via HTTPS to fileshare-sync.net (rare destination)
+    - Persistence mechanism via Run registry key
+    - Significant data transfer volume to external IP 193.29.13.88
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - identify_archive
+    - confirm_upload
+    - identify_persistence
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-004.events.jsonl
+  events_file_csv: data/SCN-004.events.csv

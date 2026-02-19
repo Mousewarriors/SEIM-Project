@@ -1,0 +1,77 @@
+scenario:
+  id: SCN-022
+  name: Internal Thread Hijack → HTML Smuggling → OAuth Abuse → Mail Exfil
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-117
+  title: HTML Smuggling / OAuth Consent Abuse (Mailbox Rule + Forwarding)
+  severity: high
+  category: email_compromise
+  status: open
+  created_at: '2024-11-05T14:36:45Z'
+  host: WKSTN-051
+  user: dlee
+  description: >-
+    User opened HTML attachment leading to mshta/powershell activity and OAuth
+    consent abuse with mailbox rule/forwarding changes.
+iocs:
+  ips:
+    - 82.118.242.99
+  domains:
+    - invoices-portal-secure.com
+    - protonmail.com
+  urls:
+    - https://invoices-portal-secure.com/view
+  hashes:
+    - fe35e691e6b7a18883eb1c3bedf68b53322858e4d5287828e34ec5b71455f45e
+    - bbebfe51219cbc1efbe3df08956f35d962e58a31990f2a9d6e28cb73951f68f1
+    - be81264703aeab8bfbae68770251e7909453fe937189697eff35e2d9daf7ca3d
+playbook:
+  name: BEC / OAuth Consent / Mailbox Rule Triage
+  steps:
+    - >-
+      Review email thread and attachment; validate sender authenticity and
+      message trace.
+    - >-
+      Confirm HTML smuggling indicators (mshta execution, Temp HTA creation,
+      downloads).
+    - >-
+      Review AzureAD consent logs and app permissions; revoke suspicious OAuth
+      grants.
+    - >-
+      Inspect mailbox rule and forwarding changes; remove and recover deleted
+      items.
+    - >-
+      Pivot to Graph API access patterns and scope impact
+      (Mail.Read/Files.Read).
+    - >-
+      Containment: reset password, revoke sessions/tokens, block domains/hashes,
+      notify finance stakeholders.
+scoring:
+  required_actions:
+    - identify_html_smuggling
+    - confirm_mshta_chain
+    - identify_oauth_consent
+    - identify_mailbox_rule_forwarding
+    - recommend_revoke_tokens
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-022.events.jsonl
+  events_file_csv: data/SCN-022.events.csv
+  zeek_dir: data/zeek/SCN-022/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'HTML Smuggling / OAuth Consent Abuse
+    (Mailbox Rule + Forwarding)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Html Smuggling
+    - Confirm Mshta Chain
+    - Identify Oauth Consent
+    - Identify Mailbox Rule Forwarding
+    - Recommend Revoke Tokens
+  recommended_action: escalate
+  containment_required: true

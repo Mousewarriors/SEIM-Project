@@ -1,0 +1,44 @@
+scenario:
+  id: SCN-122
+  name: RDP Login From Unusual Subnet
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-122
+  title: RDP Login From Unusual Subnet
+  severity: medium
+  category: identity
+  status: open
+  created_at: '2024-11-20T11:27:00Z'
+  host: WKSTN-031
+  user: bchan
+  description: 'Light alert: RDP Login From Unusual Subnet'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-122.events.jsonl
+  events_file_csv: data/SCN-122.events.csv
+answer:
+  verdict: true_positive
+  severity: medium
+  summary: >-
+    Investigation confirms the alert 'RDP Login From Unusual Subnet'. Analysis
+    of the event logs reveals: Light alert: RDP Login From Unusual Subnet.
+  key_findings:
+    - Triage
+  recommended_action: close
+  containment_required: true

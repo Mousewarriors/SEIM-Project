@@ -1,0 +1,71 @@
+scenario:
+  id: SCN-014
+  name: LLMNR Poisoning → NTLM Relay → Remote Service Install Attempt
+  difficulty: intermediate
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-014
+  title: Possible NTLM Relay / LLMNR Poisoning with Remote Service Installation
+  severity: high
+  category: lateral_movement
+  status: open
+  created_at: '2024-12-12T09:49:10Z'
+  host: SRV-APP-01
+  user: Administrator
+  description: >-
+    Rogue internal host responded to name resolution, captured NTLM, and relayed
+    to server resulting in remote service install attempts.
+iocs:
+  ips:
+    - 10.10.31.250
+  domains:
+    - wpad-update.local
+  urls: []
+  hashes:
+    - f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0abcded4e5
+playbook:
+  name: NTLM Relay / Name Resolution Poisoning Triage
+  steps:
+    - >-
+      Review name resolution events (WPAD/LLMNR/NBNS) and identify unexpected
+      responders.
+    - Correlate SMB/HTTP NTLM authentication attempts to rogue internal IPs.
+    - >-
+      Validate server-side artifacts (new service installs, temp binaries,
+      scheduled tasks).
+    - >-
+      Check DC authentication anomalies for NTLM usage spikes and privileged
+      account exposure.
+    - >-
+      Scope hunt for other hosts contacting the rogue IP or same service
+      name/binary hash.
+    - >-
+      Containment: isolate rogue device, disable LLMNR/NBNS where possible,
+      rotate affected creds, remediate server artifacts.
+scoring:
+  required_actions:
+    - identify_llmnr_poisoning
+    - identify_ntlm_relay_path
+    - confirm_service_install_attempt
+    - scope_other_hosts
+    - recommend_disable_llmnr_and_rotate
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-014.events.jsonl
+  events_file_csv: data/SCN-014.events.csv
+  zeek_dir: data/zeek/SCN-014/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Possible NTLM Relay / LLMNR Poisoning with
+    Remote Service Installation'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Llmnr Poisoning
+    - Identify Ntlm Relay Path
+    - Confirm Service Install Attempt
+    - Scope Other Hosts
+    - Recommend Disable Llmnr And Rotate
+  recommended_action: escalate
+  containment_required: true

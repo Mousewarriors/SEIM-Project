@@ -1,0 +1,57 @@
+scenario:
+  id: SCN-017
+  name: HTML Smuggling → mshta → OAuth Abuse
+  difficulty: high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-017
+  title: HTML Smuggling → mshta → OAuth Abuse
+  severity: high
+  category: email_compromise
+  status: open
+  created_at: '2024-11-02T09:00:00Z'
+  host: WKSTN-044
+  user: mturner
+  description: Investigation into html smuggling → mshta → oauth abuse activity.
+iocs:
+  ips:
+    - 185.193.17.91
+  domains:
+    - malicious-secure-login.net
+  urls:
+    - https://malicious-secure-login.net/login
+  hashes:
+    - 56304fe2ec5ebfeef3f52ba4fa38f863bf03ad773cafb511b10341a9f3b2d347
+playbook:
+  name: HTML Smuggling → mshta → OAuth Abuse Triage
+  steps:
+    - Review initial alert and context
+    - Correlate endpoint and network telemetry
+    - Analyze Zeek logs for patterns
+    - Identify IOCs and validate externally
+    - Contain affected host and user
+scoring:
+  required_actions:
+    - identify_initial_vector
+    - identify_network_pattern
+    - extract_iocs
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-017.events.jsonl
+  events_file_csv: data/SCN-017.events.csv
+  zeek_dir: data/zeek/SCN-017/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'HTML Smuggling → mshta → OAuth Abuse'.
+    Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Initial Vector
+    - Identify Network Pattern
+    - Extract Iocs
+    - Recommend Containment
+  recommended_action: escalate
+  containment_required: true

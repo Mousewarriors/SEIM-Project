@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-117
+  name: Email Attachment Hashed as Suspicious
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-117
+  title: Email Attachment Hashed as Suspicious
+  severity: high
+  category: email
+  status: open
+  created_at: '2024-11-20T10:52:00Z'
+  host: WKSTN-031
+  user: bchan
+  description: 'Light alert: Email Attachment Hashed as Suspicious'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >
+    Suspicious DLL was side-loaded into a legitimate application process. The
+    DLL hash is unknown and the file was recently dropped to disk. This is a
+    common technique for code execution while evading detection.
+  key_findings:
+    - Unknown DLL loaded by legitimate application
+    - DLL was recently written to disk
+    - DLL side-loading is a known defense evasion technique
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-117.events.jsonl
+  events_file_csv: data/SCN-117.events.csv

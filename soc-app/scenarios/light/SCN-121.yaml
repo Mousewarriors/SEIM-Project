@@ -1,0 +1,44 @@
+scenario:
+  id: SCN-121
+  name: WMI Remote Execution Attempt
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-121
+  title: WMI Remote Execution Attempt
+  severity: high
+  category: endpoint
+  status: open
+  created_at: '2024-11-20T11:20:00Z'
+  host: WKSTN-031
+  user: bchan
+  description: 'Light alert: WMI Remote Execution Attempt'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-121.events.jsonl
+  events_file_csv: data/SCN-121.events.csv
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'WMI Remote Execution Attempt'. Analysis of
+    the event logs reveals: Light alert: WMI Remote Execution Attempt.
+  key_findings:
+    - Triage
+  recommended_action: escalate
+  containment_required: true

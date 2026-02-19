@@ -1,0 +1,57 @@
+scenario:
+  id: SCN-020
+  name: Infostealer → Cookie Theft → Mailbox Hijack
+  difficulty: high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-020
+  title: Infostealer → Cookie Theft → Mailbox Hijack
+  severity: high
+  category: data_exfiltration
+  status: open
+  created_at: '2024-11-05T09:00:00Z'
+  host: WKSTN-044
+  user: mturner
+  description: Investigation into infostealer → cookie theft → mailbox hijack activity.
+iocs:
+  ips:
+    - 185.193.17.91
+  domains:
+    - malicious-secure-login.net
+  urls:
+    - https://malicious-secure-login.net/login
+  hashes:
+    - 8b7aa22fbe186c5847fdbbdfe51c69cacdb1adbbb3302c7cad5d38d6a003e40f
+playbook:
+  name: Infostealer → Cookie Theft → Mailbox Hijack Triage
+  steps:
+    - Review initial alert and context
+    - Correlate endpoint and network telemetry
+    - Analyze Zeek logs for patterns
+    - Identify IOCs and validate externally
+    - Contain affected host and user
+scoring:
+  required_actions:
+    - identify_initial_vector
+    - identify_network_pattern
+    - extract_iocs
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-020.events.jsonl
+  events_file_csv: data/SCN-020.events.csv
+  zeek_dir: data/zeek/SCN-020/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Infostealer → Cookie Theft → Mailbox
+    Hijack'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Initial Vector
+    - Identify Network Pattern
+    - Extract Iocs
+    - Recommend Containment
+  recommended_action: escalate
+  containment_required: true

@@ -1,0 +1,64 @@
+scenario:
+  id: SCN-010
+  name: DNS Tunneling → Staging → Exfil via Queries
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-010
+  title: Possible DNS Tunneling Detected (High-Volume TXT Queries)
+  severity: critical
+  category: data_exfiltration
+  status: open
+  created_at: '2024-12-02T01:41:30Z'
+  host: WKSTN-031
+  user: bchan
+  description: >-
+    High-volume DNS queries with long, encoded subdomains consistent with DNS
+    tunneling/exfiltration.
+iocs:
+  ips:
+    - 162.55.88.19
+  domains:
+    - data-sync-dns.net
+  urls:
+    - https://data-sync-dns.net/
+  hashes:
+    - 0c0d0e0f00112233445566778899aabbccddeeff00112233445566778899aabb
+playbook:
+  name: DNS Tunneling / Exfiltration Triage
+  steps:
+    - >-
+      Review DNS telemetry for long/encoded subdomains and query volume
+      anomalies.
+    - Identify the process responsible and confirm command line / binary hash.
+    - Pivot to first-seen domain and nameserver IP; validate IOCs.
+    - 'Scope hunt: other hosts querying same tunneling domain.'
+    - >-
+      Containment: isolate host, block domain at DNS, disable suspicious
+      binaries, preserve evidence.
+    - Assess data-at-risk and coordinate response.
+scoring:
+  required_actions:
+    - identify_dns_tunneling
+    - identify_responsible_process
+    - extract_tunnel_domain
+    - recommend_dns_block
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-010.events.jsonl
+  events_file_csv: data/SCN-010.events.csv
+  zeek_dir: data/zeek/SCN-010/
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >-
+    Investigation confirms the alert 'Possible DNS Tunneling Detected
+    (High-Volume TXT Queries)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Dns Tunneling
+    - Identify Responsible Process
+    - Extract Tunnel Domain
+    - Recommend Dns Block
+  recommended_action: escalate
+  containment_required: true

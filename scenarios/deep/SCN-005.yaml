@@ -1,0 +1,68 @@
+scenario:
+  id: SCN-005
+  name: Ransomware Precursor Activity on Endpoint
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-005
+  title: Shadow Copy Deletion Attempt (vssadmin) + High-Rate File Modifications
+  severity: critical
+  category: ransomware
+  status: open
+  created_at: '2024-11-14T02:13:30Z'
+  host: WKSTN-014
+  user: jdoe
+  description: >-
+    Suspicious dropper executed; vssadmin shadow deletion attempted; multiple
+    files modified and ransom note created.
+iocs:
+  ips:
+    - 185.82.219.54
+  domains:
+    - update-storage.cc
+  urls:
+    - http://update-storage.cc/bin/loader.exe
+  hashes:
+    - aa11bb22cc33dd44ee55ff6677889900aa11bb22cc33dd44ee55ff6677889900
+    - bb22cc33dd44ee55ff6677889900aa11bb22cc33dd44ee55ff6677889900aa11
+playbook:
+  name: Ransomware Triage
+  steps:
+    - Confirm suspicious execution chain and dropper origin (URL, file hash).
+    - Identify destructive actions (vssadmin delete, backup tampering).
+    - Assess encryption impact via file modification burst and extensions.
+    - >-
+      Hunt for lateral spread indicators (SMB, remote services, scheduled
+      tasks).
+    - >-
+      Immediate containment: isolate host(s), disable account, block IOCs,
+      preserve evidence.
+    - 'Recovery guidance: engage IR, restore from backups, rotate credentials.'
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >
+    Confirmed ransomware precursor / active ransomware incident. A dropper was
+    downloaded from update-storage.cc and executed, followed by vssadmin shadow
+    copy deletion (anti-recovery tactic). High-rate file modifications with
+    changed extensions indicate active encryption. Ransom note was created.
+    Immediate host isolation and IR engagement required.
+  key_findings:
+    - Dropper downloaded from update-storage.cc/bin/loader.exe
+    - vssadmin shadow copy deletion attempted (anti-recovery)
+    - High-rate file modifications indicating active encryption
+    - Ransom note file created on disk
+    - No lateral movement confirmed yet but must be hunted
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - identify_dropper
+    - identify_shadow_delete
+    - assess_impact
+    - recommend_immediate_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-005.events.jsonl
+  events_file_csv: data/SCN-005.events.csv

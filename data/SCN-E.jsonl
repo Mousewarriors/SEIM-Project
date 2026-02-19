@@ -1,0 +1,6 @@
+{"@timestamp": "2024-10-05T09:00:00Z", "event.dataset": "email", "email.subject": "Ransomware Precursor (Shadow Copy Delete) \u2013 Action Required", "email.from": "alerts@external-mail.com", "email.to": "user@company.com", "event.original": "SPF=fail DKIM=none DMARC=fail"}
+{"@timestamp": "2024-10-05T09:02:00Z", "event.dataset": "browser", "url.full": "http://malicious-site.example/login", "user_agent.original": "Chrome/121.0", "event.original": "Browser navigation"}
+{"@timestamp": "2024-10-05T09:03:00Z", "event.dataset": "endpoint", "process.name": "powershell.exe", "process.command_line": "powershell -enc SQBmAG8AbwA=", "event.original": "Encoded PowerShell execution"}
+{"@timestamp": "2024-10-05T09:04:00Z", "event.dataset": "terminal", "terminal.command": "whoami", "event.original": "user@host$ whoami"}
+{"@timestamp": "2024-10-05T09:05:00Z", "event.dataset": "network", "source.ip": "10.10.14.23", "destination.ip": "185.100.4.14", "destination.port": 443, "network.bytes": 2048, "event.original": "TLS connection"}
+{"@timestamp": "2024-10-05T09:06:00Z", "event.dataset": "threat_intel", "threat.indicator.ip": "185.100.4.14", "threat.indicator.confidence": "high", "event.original": "Matched known malicious IP"}

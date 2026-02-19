@@ -1,0 +1,72 @@
+scenario:
+  id: SCN-015
+  name: TOR-like Beaconing → Miner Drop → Persistence → Pool Traffic
+  difficulty: intermediate
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-015
+  title: Possible Cryptominer Deployment (TOR Exit Beaconing + Mining Pool Traffic)
+  severity: high
+  category: malware_execution
+  status: open
+  created_at: '2024-12-15T22:12:30Z'
+  host: WKSTN-014
+  user: jdoe
+  description: >-
+    Workstation connected repeatedly to TOR exit-like IPs, downloaded unsigned
+    binary, established long-lived pool connections, and showed high CPU.
+iocs:
+  ips:
+    - 185.220.101.1
+    - 185.220.102.4
+    - 45.133.1.90
+  domains:
+    - edge-checkup.net
+    - xmr-eu1.pool-mining.example
+  urls:
+    - https://edge-checkup.net/dl/sysupd.exe
+  hashes:
+    - 93a4b5c6d7e8f90123456789abcdef0123456789abcdef0123456789abcdef01
+    - 84b5c6d7e8f90123456789abcdef0123456789abcdef0123456789abcdef0123
+playbook:
+  name: Cryptomining / TOR-like C2 Triage
+  steps:
+    - Review DNS and TLS traffic for TOR exit patterns and first-seen domains.
+    - Identify payload download and validate file hashes in VirusTotal.
+    - >-
+      Check endpoint process tree and persistence mechanisms (Run keys /
+      scheduled tasks).
+    - Correlate network to mining pool endpoints (long-lived, periodic traffic).
+    - >-
+      Scope hunt: other hosts contacting same TOR/pool IOCs; look for same
+      binary/hash.
+    - >-
+      Containment: isolate host, remove persistence, block IOCs, reset creds if
+      needed, reimage if policy requires.
+scoring:
+  required_actions:
+    - identify_tor_beaconing
+    - identify_payload_download
+    - identify_persistence
+    - identify_pool_traffic
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-015.events.jsonl
+  events_file_csv: data/SCN-015.events.csv
+  zeek_dir: data/zeek/SCN-015/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'Possible Cryptominer Deployment (TOR Exit
+    Beaconing + Mining Pool Traffic)'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Tor Beaconing
+    - Identify Payload Download
+    - Identify Persistence
+    - Identify Pool Traffic
+    - Recommend Containment
+  recommended_action: escalate
+  containment_required: true

@@ -1,0 +1,77 @@
+scenario:
+  id: SCN-024
+  name: OAuth Consent → Graph/SharePoint Collection → Local Staging → Exfil
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-119
+  title: OAuth App Abuse and SharePoint Data Collection Suspected
+  severity: high
+  category: cloud_compromise
+  status: open
+  created_at: '2024-11-09T10:18:40Z'
+  host: WKSTN-044
+  user: mturner
+  description: >-
+    User granted OAuth consent to suspicious app, followed by abnormal
+    Graph/SharePoint downloads and uploads to unknown endpoint.
+iocs:
+  ips:
+    - 185.71.67.20
+    - 77.91.84.162
+  domains:
+    - company.sharepoint.com
+    - company-my.sharepoint.com
+    - docs-exporter.net
+  urls:
+    - https://login.microsoftonline.com/consent
+  hashes:
+    - f0bca75f6398959d0aa74a6dcc6e03e2d609c089632c0f453112f5482ba8062b
+playbook:
+  name: OAuth App Abuse / Cloud Data Access Triage
+  steps:
+    - >-
+      Validate consent grant: app name, publisher, scopes; confirm user
+      interaction.
+    - >-
+      Review browser/proxy logs around consent and subsequent API
+      calls/downloads.
+    - >-
+      Correlate Graph/SharePoint/OneDrive access volumes and file names where
+      available.
+    - >-
+      Identify any local staging artifacts and subsequent uploads to unknown
+      endpoints.
+    - >-
+      Containment: revoke OAuth grant, invalidate refresh tokens, block IOCs,
+      review conditional access and consent policies.
+    - >-
+      Scope: search for other users consenting to same app; remove malicious
+      service principals.
+scoring:
+  required_actions:
+    - identify_oauth_consent
+    - extract_scopes
+    - identify_graph_download_burst
+    - identify_exfil_endpoint
+    - recommend_revoke_oauth_tokens
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-024.events.jsonl
+  events_file_csv: data/SCN-024.events.csv
+  zeek_dir: data/zeek/SCN-024/
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >-
+    Investigation confirms the alert 'OAuth App Abuse and SharePoint Data
+    Collection Suspected'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Oauth Consent
+    - Extract Scopes
+    - Identify Graph Download Burst
+    - Identify Exfil Endpoint
+    - Recommend Revoke Oauth Tokens
+  recommended_action: escalate
+  containment_required: true

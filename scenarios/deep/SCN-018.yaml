@@ -1,0 +1,57 @@
+scenario:
+  id: SCN-018
+  name: Lateral Movement → DC Recon
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-018
+  title: Lateral Movement → DC Recon
+  severity: medium-high
+  category: lateral_movement
+  status: open
+  created_at: '2024-11-03T09:00:00Z'
+  host: WKSTN-044
+  user: mturner
+  description: Investigation into lateral movement → dc recon activity.
+iocs:
+  ips:
+    - 185.193.17.91
+  domains:
+    - malicious-secure-login.net
+  urls:
+    - https://malicious-secure-login.net/login
+  hashes:
+    - da5a778da3695ff87f20cbda8fa4dcb5e191787d1602f38b9a36d2c6272d7955
+playbook:
+  name: Lateral Movement → DC Recon Triage
+  steps:
+    - Review initial alert and context
+    - Correlate endpoint and network telemetry
+    - Analyze Zeek logs for patterns
+    - Identify IOCs and validate externally
+    - Contain affected host and user
+scoring:
+  required_actions:
+    - identify_initial_vector
+    - identify_network_pattern
+    - extract_iocs
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-018.events.jsonl
+  events_file_csv: data/SCN-018.events.csv
+  zeek_dir: data/zeek/SCN-018/
+answer:
+  verdict: true_positive
+  severity: medium-high
+  summary: >-
+    Investigation confirms the alert 'Lateral Movement → DC Recon'. Analysis
+    reveals suspicious activity.
+  key_findings:
+    - Identify Initial Vector
+    - Identify Network Pattern
+    - Extract Iocs
+    - Recommend Containment
+  recommended_action: close
+  containment_required: true

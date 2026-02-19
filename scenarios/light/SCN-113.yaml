@@ -1,0 +1,47 @@
+scenario:
+  id: SCN-113
+  name: Rare Parent-Child Process
+  difficulty: beginner
+  estimated_time_minutes: 10
+  deep_scenario: false
+alert:
+  id: ALT-SCN-113
+  title: Rare Parent-Child Process
+  severity: medium
+  category: endpoint
+  status: open
+  created_at: '2024-11-20T10:24:00Z'
+  host: WKSTN-014
+  user: jdoe
+  description: 'Light alert: Rare Parent-Child Process'
+iocs:
+  ips: []
+  domains: []
+  urls: []
+  hashes: []
+playbook:
+  name: Quick Triage
+  steps:
+    - Review alert context.
+    - Validate via telemetry pivot.
+    - Decide close/contain/escalate.
+answer:
+  verdict: true_positive
+  severity: medium
+  summary: >
+    PowerShell execution policy was bypassed using -ExecutionPolicy Bypass flag.
+    While this can be legitimate, the script content and context suggest
+    suspicious activity that needs further investigation.
+  key_findings:
+    - ExecutionPolicy bypass flag used to run unsigned script
+    - Script was downloaded from an external source
+    - Activity does not match known admin patterns
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - triage
+  max_score: 20
+events_ref:
+  events_file_jsonl: data/SCN-113.events.jsonl
+  events_file_csv: data/SCN-113.events.csv

@@ -1,0 +1,66 @@
+scenario:
+  id: SCN-002
+  name: Phishing → OAuth Consent → Mailbox Rule Persistence
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-002
+  title: Suspicious OAuth Application Consent
+  severity: critical
+  category: identity_compromise
+  status: open
+  created_at: '2024-11-03T08:45:20Z'
+  host: N/A
+  user: alice.smith
+  description: >-
+    User clicked invoice lure; suspicious OAuth app consent followed by mailbox
+    rule creation and Graph API access.
+iocs:
+  ips:
+    - 91.219.236.87
+  domains:
+    - micr0soft-support.com
+  urls:
+    - https://micr0soft-support.com/invoice/Review.html
+  hashes:
+    - a9d6b3b0d0e2c3f4a5b6c7d8e9f00112233445566778899aabbccddeeff0011
+playbook:
+  name: Suspicious OAuth Consent / BEC Triage
+  steps:
+    - >-
+      Review phish email authentication results (SPF/DKIM/DMARC) and
+      URLs/attachments.
+    - Confirm OAuth consent details (app name, scopes, client_id, source IP).
+    - Assess persistence (mailbox rules, forwarding, OAuth refresh tokens).
+    - Identify scope (other users consenting to same app / same source IP).
+    - >-
+      Containment: revoke OAuth app, remove rules/forwarding, reset creds + MFA
+      review.
+    - Document indicators and user impact; close with lessons learned.
+answer:
+  verdict: true_positive
+  severity: critical
+  summary: >
+    Confirmed business email compromise via OAuth consent phishing. User clicked
+    a phishing link disguised as an invoice, consented to a malicious OAuth app
+    granting mail read/send permissions. Attacker created mailbox forwarding
+    rules for persistence and accessed email via Graph API. Immediate credential
+    reset and OAuth app revocation required.
+  key_findings:
+    - Phishing email with typosquatted domain micr0soft-support.com
+    - Malicious OAuth app granted mail.read and mail.send scopes
+    - Mailbox forwarding rule created for data exfiltration
+    - Graph API access from suspicious IP 91.219.236.87
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - identify_phish
+    - identify_oauth_abuse
+    - identify_mailbox_rule
+    - recommend_revoke_and_reset
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-002.events.jsonl
+  events_file_csv: data/SCN-002.events.csv

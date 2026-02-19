@@ -1,0 +1,47 @@
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** 18+ and **npm**
+- **Ollama** (optional, for AI assistant) — [Install Ollama](https://ollama.ai)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/siem-soc-training.git
+cd siem-soc-training/soc-app
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### AI Assistant Setup (Optional)
+
+```bash
+# Install Ollama and pull the model
+ollama pull qwen2.5:14b
+
+# Ollama runs automatically on localhost:11434
+# The app will detect it and enable the AI assistant
+```
+
+If Ollama is not running, the AI assistant gracefully falls back with a connection error message — all other features work independently.
+
+### OpenSearch Integration (Optional)
+
+```bash
+# Create the index
+curl -X PUT "localhost:9200/soc-events" -H "Content-Type: application/json" -d @opensearch/index-mapping.json
+
+# Bulk import events
+curl -X POST "localhost:9200/_bulk" -H "Content-Type: application/x-ndjson" --data-binary @opensearch/bulk.ndjson
+```
+
+---

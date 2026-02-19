@@ -1,0 +1,100 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    }
+  },
+  "mappings": {
+    "dynamic": true,
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "event.dataset": {
+        "type": "keyword"
+      },
+      "event.action": {
+        "type": "keyword"
+      },
+      "event.kind": {
+        "type": "keyword"
+      },
+      "event.category": {
+        "type": "keyword"
+      },
+      "event.outcome": {
+        "type": "keyword"
+      },
+      "host.name": {
+        "type": "keyword"
+      },
+      "host.ip": {
+        "type": "ip"
+      },
+      "user.name": {
+        "type": "keyword"
+      },
+      "user.email": {
+        "type": "keyword"
+      },
+      "source.ip": {
+        "type": "ip"
+      },
+      "destination.ip": {
+        "type": "ip"
+      },
+      "destination.port": {
+        "type": "integer"
+      },
+      "network.transport": {
+        "type": "keyword"
+      },
+      "network.protocol": {
+        "type": "keyword"
+      },
+      "network.bytes": {
+        "type": "long"
+      },
+      "url.full": {
+        "type": "wildcard"
+      },
+      "dns.question.name": {
+        "type": "keyword"
+      },
+      "dns.answers.data": {
+        "type": "keyword"
+      },
+      "process.name": {
+        "type": "keyword"
+      },
+      "process.command_line": {
+        "type": "wildcard"
+      },
+      "process.parent.name": {
+        "type": "keyword"
+      },
+      "file.path": {
+        "type": "wildcard"
+      },
+      "file.hash.sha256": {
+        "type": "keyword"
+      },
+      "email.subject": {
+        "type": "wildcard"
+      },
+      "email.from.address": {
+        "type": "keyword"
+      },
+      "email.to.address": {
+        "type": "keyword"
+      },
+      "event.original": {
+        "type": "wildcard"
+      },
+      "tags": {
+        "type": "keyword"
+      }
+    }
+  }
+}

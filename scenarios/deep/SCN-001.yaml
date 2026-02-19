@@ -1,0 +1,64 @@
+scenario:
+  id: SCN-001
+  name: Encoded PowerShell Leading to C2 Beaconing
+  difficulty: intermediate
+  estimated_time_minutes: 60
+  deep_scenario: true
+alert:
+  id: ALT-001
+  title: Encoded PowerShell Downloading External Payload
+  severity: high
+  category: malware_execution
+  status: open
+  created_at: '2024-11-01T09:14:22Z'
+  host: WKSTN-014
+  user: jdoe
+  description: >-
+    Suspicious PowerShell execution with encoded command spawned from Outlook;
+    subsequent outbound beaconing observed.
+iocs:
+  ips:
+    - 185.234.218.71
+  domains:
+    - malicious-update.com
+  urls:
+    - http://malicious-update.com/update.ps1
+  hashes:
+    - 3b9f1e2d9c8b9e0b4f7e2b88c91d5f7c3d0f1a2b3c4d5e6f7a8b9c0d1e2f
+playbook:
+  name: Suspicious PowerShell Execution
+  steps:
+    - Decode PowerShell command and confirm intent (download/exec).
+    - Identify parent process and initial vector (email/office/web).
+    - Pivot to DNS/proxy for domain/IP and timing alignment.
+    - Validate extracted IOCs (domain/IP/hash) in VirusTotal.
+    - Confirm beaconing pattern and check for additional affected hosts.
+    - >-
+      Recommend containment (isolate host, reset creds, block IOCs) and document
+      case.
+answer:
+  verdict: true_positive
+  severity: high
+  summary: >
+    This is a confirmed malware execution incident. An encoded PowerShell
+    command was launched via Outlook (likely from a phishing email), which
+    downloaded and executed a remote payload from malicious-update.com.
+    Subsequent C2 beaconing was observed to 185.234.218.71. Immediate
+    containment is required.
+  key_findings:
+    - Encoded PowerShell downloaded external payload from malicious-update.com
+    - Parent process was Outlook indicating phishing as initial vector
+    - C2 beaconing pattern confirmed to 185.234.218.71
+    - Host WKSTN-014 compromised and requires isolation
+  recommended_action: escalate
+  containment_required: true
+scoring:
+  required_actions:
+    - identify_encoded_powershell
+    - extract_iocs
+    - confirm_beaconing
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-001.events.jsonl
+  events_file_csv: data/SCN-001.events.csv

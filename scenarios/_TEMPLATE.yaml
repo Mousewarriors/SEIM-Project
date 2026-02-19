@@ -1,0 +1,60 @@
+# Scenario Template
+# Copy this file and rename it to SCN-XXX.yaml (e.g. SCN-201.yaml)
+# Place it in either: scenarios/deep/ (complex) or scenarios/light/ (quick triage)
+# Then place your event file in the data/ folder as SCN-XXX.events.jsonl
+
+scenario:
+  id: SCN-XXX                    # Unique ID matching filename (e.g. SCN-201)
+  name: Your Scenario Name       # Give it a descriptive name
+  difficulty: beginner            # beginner | intermediate | advanced
+  estimated_time_minutes: 15      # Estimated time to complete
+  deep_scenario: false            # true = complex with rich telemetry, false = quick triage
+
+alert:
+  id: ALT-SCN-XXX                # Unique alert ID
+  title: Alert Title Here         # The alert title shown in the dashboard
+  severity: medium                # low | medium | high | critical
+  category: network               # Category (e.g. malware, phishing, identity, network, endpoint)
+  status: open                    # Always set to 'open'
+  created_at: '2024-12-01T09:00:00Z'  # Timestamp for the alert
+  host: WKSTN-001                 # Affected hostname
+  user: jsmith                    # Affected username
+  description: >
+    Describe what triggered this alert and what the analyst needs to investigate.
+
+iocs:
+  ips:
+  - 1.2.3.4                      # Leave arrays empty [] if no IOCs for that type
+  domains:
+  - example-bad.com
+  urls: []
+  hashes: []
+
+playbook:
+  name: Investigation Playbook    # Playbook name
+  steps:
+  - Step 1 of the investigation.
+  - Step 2 of the investigation.
+  - Step 3 of the investigation.
+
+# ANSWER SECTION — This is what the analyst is graded against
+answer:
+  verdict: true_positive          # true_positive | false_positive | benign
+  severity: medium                # The correct severity assessment
+  summary: >
+    Explain the correct analysis of this scenario. What happened?
+    Why is this a true/false positive? What should the analyst have found?
+  key_findings:
+  - First key finding the analyst should discover
+  - Second key finding
+  - Third key finding
+  recommended_action: escalate    # close | escalate | monitor
+
+scoring:
+  required_actions:
+  - action_name                   # Internal scoring keys (optional, for future use)
+  max_score: 100
+
+events_ref:
+  events_file_jsonl: data/SCN-XXX.events.jsonl
+  events_file_csv: data/SCN-XXX.events.csv

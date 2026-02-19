@@ -1,0 +1,59 @@
+scenario:
+  id: SCN-016
+  name: Credential Phish → PowerShell Loader → Beaconing
+  difficulty: medium-high
+  estimated_time_minutes: 75
+  deep_scenario: true
+alert:
+  id: ALT-016
+  title: Credential Phish → PowerShell Loader → Beaconing
+  severity: medium-high
+  category: initial_access
+  status: open
+  created_at: '2024-11-01T09:00:00Z'
+  host: WKSTN-044
+  user: mturner
+  description: >-
+    Investigation into credential phish → powershell loader → beaconing
+    activity.
+iocs:
+  ips:
+    - 185.193.17.91
+  domains:
+    - malicious-secure-login.net
+  urls:
+    - https://malicious-secure-login.net/login
+  hashes:
+    - 6d72df9752725bde9e310c631abacf13ef06e0fbcdc548208d9d61ef713dc8e0
+playbook:
+  name: Credential Phish → PowerShell Loader → Beaconing Triage
+  steps:
+    - Review initial alert and context
+    - Correlate endpoint and network telemetry
+    - Analyze Zeek logs for patterns
+    - Identify IOCs and validate externally
+    - Contain affected host and user
+scoring:
+  required_actions:
+    - identify_initial_vector
+    - identify_network_pattern
+    - extract_iocs
+    - recommend_containment
+  max_score: 100
+events_ref:
+  events_file_jsonl: data/SCN-016.events.jsonl
+  events_file_csv: data/SCN-016.events.csv
+  zeek_dir: data/zeek/SCN-016/
+answer:
+  verdict: true_positive
+  severity: medium-high
+  summary: >-
+    Investigation confirms the alert 'Credential Phish → PowerShell Loader →
+    Beaconing'. Analysis reveals suspicious activity.
+  key_findings:
+    - Identify Initial Vector
+    - Identify Network Pattern
+    - Extract Iocs
+    - Recommend Containment
+  recommended_action: close
+  containment_required: true
