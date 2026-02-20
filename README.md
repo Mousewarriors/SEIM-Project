@@ -34,8 +34,7 @@ A fully interactive **Security Operations Center (SOC)** training environment bu
 - **Event Log Viewer** — filterable by dataset (Network, Endpoint, Email, Terminal) with full text search
 - **Expandable events** — click any event to view the full raw JSON payload
 - **Playbook Progress Tracker** — checklist-style steps with completion percentage bar
-- **IOC Reference Panel** — known indicators of compromise (IPs, domains, hashes) displayed as pills
-- **MITRE ATT&CK alignment** — scenarios map to real ATT&CK techniques
+- **IOC Reference Panel** — known indicators of compromise (IPs, domains, hashes) displayed as automated evidence.
 
 ### 🤖 AI-Powered Investigation Assistant
 - **Ollama integration** via API proxy (`/api/ai-chat`) using the `qwen2.5:14b` model
@@ -140,7 +139,7 @@ SIEM SOC Training/
 
 ## 📊 Scenario Content
 
-### Deep Scenarios (5)
+### Deep Scenarios (15)
 Full investigation scenarios with rich telemetry, multiple event types, and comprehensive playbooks. Each includes 50–200+ correlated events across network, endpoint, email, and terminal datasets.
 
 ### Light Scenarios (25)
