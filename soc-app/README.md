@@ -25,11 +25,11 @@ To enable the MITRE analysis feature, you must run the Python backend server alo
 
 You can do this in two ways:
 
-1. **Integrated Startup (Recommended for Windows):**
+1. **Integrated Startup (now cross-platform):**
    ```bash
    npm run dev:mitre
    ```
-   This will launch the Python server in a new window and start the Next.js app in the current terminal.
+   This uses `concurrently` to launch the Python MITRE analyzer and `next dev` in the same terminal on every platform.
 
 2. **Manual Startup:**
    Open a separate terminal and run:
@@ -42,6 +42,8 @@ You can do this in two ways:
    ```
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+> Configure `MITRE_ANALYZER_URL` and `INGEST_API_KEY` in `.env.local` (see the root README) so the MITRE proxy and `/api/ingest` are wired to your environment.
 
 ## Learn More
 

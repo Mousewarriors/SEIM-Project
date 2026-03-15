@@ -104,7 +104,7 @@ SIEM SOC Training/
 │   │       └── store.ts              # Zustand state (alerts, AI chat, notepad)
 │   └── package.json
 ├── scenarios/
-│   ├── deep/                   # 5 deep investigation scenarios (SCN-001..005)
+│   ├── deep/                   # 35 deep investigation scenarios (SCN-001..SCN-025 + ASN-401..ASN-410)
 │   └── light/                  # 25 light triage scenarios (SCN-101..125)
 ├── data/
 │   ├── *.events.jsonl          # Per-scenario event telemetry (ECS-like JSON)
@@ -139,8 +139,10 @@ SIEM SOC Training/
 
 ## 📊 Scenario Content
 
-### Deep Scenarios (15)
+### Deep Scenarios (35)
 Full investigation scenarios with rich telemetry, multiple event types, and comprehensive playbooks. Each includes 50–200+ correlated events across network, endpoint, email, and terminal datasets.
+- **Hybrid deep scenarios (25)** — SCN-001 through SCN-025 cover the on-premises/hybrid use cases.
+- **Cloud-native deep scenarios (10)** — ASN-401 through ASN-410 focus on modern cloud tooling.
 
 ### Light Scenarios (25)
 Quick triage scenarios for practising alert assessment, priority classification, and basic IOC extraction. Each includes 10–50 events focused on a single attack vector.
@@ -214,6 +216,8 @@ This project has been hardened with the following security measures:
     -   `Permissions-Policy`
 4.  **"Powered By" Disclosure**: Disabled `X-Powered-By: Next.js` header to reduce information leakage.
 5.  **Secure Dependencies**: Regular dependency updates recommended.
+6.  **Ingest Hardening**: `/api/ingest` now enforces `INGEST_API_KEY`, schema validation, payload size/event count limits, and defensive rotation of `live.events.jsonl`.
+7.  **MITRE Forwarding**: The ATT&CK analyzer proxy now delegates to `MITRE_ANALYZER_URL`, keeping the local Python service configurable per environment.
 
 ### Configuration
 Create a `.env.local` file in the root directory:
@@ -221,11 +225,14 @@ Create a `.env.local` file in the root directory:
 ```env
 OLLAMA_API_URL=http://localhost:11434/api/chat
 OLLAMA_MODEL=qwen2.5:14b
+MITRE_ANALYZER_URL=http://localhost:8888/query
+INGEST_API_KEY=local-ingest-key
 ```
+
+`/api/ingest` now expects `x-api-key: <INGEST_API_KEY>` (or
+`Authorization: Bearer <INGEST_API_KEY>`) and the MITRE forwarder delegates to
+`MITRE_ANALYZER_URL`.
 
 ---
 
 *Built with ☕ and 🛡️ by Simon Wood*
-
-
-

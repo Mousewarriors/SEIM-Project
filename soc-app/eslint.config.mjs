@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore local archives/backups that inflate lint noise:
+    "src_backup*/**",
+    "**/src_backup*/**",
   ]),
 ]);
 

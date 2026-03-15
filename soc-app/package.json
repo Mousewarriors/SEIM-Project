@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "mitre": "python \"../../Mitre Att&ck Analyzer/mitre_api_server.py\"",
-    "dev:mitre": "start npm run mitre && next dev",
+    "dev:mitre": "concurrently \"npm run mitre\" \"next dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -20,7 +20,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -28,6 +29,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "concurrently": "^8.2.0"
   }
 }
